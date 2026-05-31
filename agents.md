@@ -1,11 +1,13 @@
-# Milestone 2: Core Library Database API (SQLite & SQLModel)
+remember this is not a huge scale webapp, it is just for the interviewer.
+Preference: DONOT EDIT or change files and codes by yourself unluess i specifically ask you to.However you(ai) have permission to view and read the files and codes anytime without the need to ask me for permission.
+i am not closing this chat/convo so no need to push everything at once.
+if code is huge,divide the code into parts and explain line by line . 
 
+# Milestone 2: Core Library Database API (SQLite & SQLModel)
 This document contains the complete step-by-step code and detailed line-by-line explanations for building your core Library System using **FastAPI** and **SQLModel**.
 
 Use this as your blueprint. Copy the code into the corresponding files in your project, and read the explanation below each block to understand exactly **why** we wrote it and **how** it connects to the rest of the app.
-
 ---
-
 ## 📁 Project Directory Structure
 Ensure your files are placed in these exact locations:
 ```text
@@ -328,4 +330,407 @@ app.include_router(book_router)
 *   `yield`: Marks the boundary. Everything before `yield` runs on startup; everything after runs when the server is turned off.
 *   `app.include_router(book_router)`: Registers the routes we defined in `app/books/router.py` to the main FastAPI app instance. Without this line, the server wouldn't know the `/books` endpoints exist.
 
-remember this is not a huge scale webapp, it is just for the interviewer
+
+
+
+so heres the thing : i was doing this using a paid udemy course but the instrustor is wired so this is the course structure i was going to learn throught the course. i will now be learning from here and researching topics from youtube myself:
+Database Model vs API Schema
+5:18
+Explore the difference between sql models and api schemas, and how sqlmodel inherits pydantic for validation. Choose to use a single model or separate schemas in fastapi endpoints.
+
+Async IO
+
+Synchronous Programming
+6:15
+Explore how FastAPI uses asynchronous programming to handle multiple requests while waiting for database responses, then simulate delays with time.sleep to test endpoints.
+
+Async & Await
+7:56
+Convert synchronous functions into asynchronous ones by using the async keyword, work with coroutines and await to run code, and orchestrate coroutine execution with asyncio for endpoints and servers.
+
+Task
+3:58
+Learn to build asynchronous endpoints by marking functions as coroutines, using await and async io run, creating tasks, and coordinating requests with wait for efficient, parallel execution.
+
+Task Group
+4:48
+Explore using async task groups to create and await multiple coroutines efficiently, with context managed by the with statement and async keyword, handling IO-bound tasks like database queries.
+
+PostgreSQL
+
+Overview
+0:44
+Learn to upgrade from SQLite to PostgreSQL in a FastAPI backend by installing PostgreSQL, creating a database, configuring access, and adding an asynchronous database session for endpoints.
+
+Installation
+6:29
+Install and configure PostgreSQL on your system, including the Postgres server and Pgadmin, set a superuser password, and use the default port 5432.
+
+Environment Variable
+11:39
+Create a Postgres database with pgAdmin, then read credentials from a .env file into your FastAPI project using pydantic settings to build a Postgres URL for secure connections.
+
+Async Session
+4:25
+Switch to an asynchronous workflow by using SQLAlchemy's async engine and async session with the Postgres URL from settings, wrapping in a sessionmaker for endpoints.
+
+API Router
+8:09
+Learn to structure a fastapi backend by creating an api router, turning endpoints asynchronous, and organizing routes, schemas, and database sessions for scalable backends.
+
+Service Layer
+10:19
+Define a shipment service class to isolate database interactions from endpoint handlers and expose async methods for get, add, update, and delete shipments.
+
+Dependency Chaining
+11:17
+General Tips
+7:00
+Organize endpoints with an API router by setting a default shipment prefix and tags. Apply global dependencies, router lifespan, and formatting tips for cleaner FastAPI code.
+
+Register User
+
+Overview
+2:15
+Register seller accounts with email and password, hash passwords before storing, and implement a seller model and service to handle authentication and access to restricted endpoints.
+
+Seller Model
+3:10
+Define a seller SQL model to create a sellers table with an auto-incrementing primary key and store a password hash using a pedantic email type.
+
+Signup Endpoint
+6:47
+Define a post signup endpoint at /seller/signup to create a new seller, accepting request body data with a seller create schema, and organize routes with a master api router.
+
+Password Hash
+11:59
+Create a seller service to handle database interactions, hash passwords with bcrypt via a password context, and store the hashed password in the database using async sessions.
+
+Seller Service
+5:00
+Wire a seller service as a dependency to an endpoint that registers a seller using seller create data, returns a seller read with name and email, and hashes the password.
+
+Login User
+
+OAuth2 Overview
+2:32
+Authenticate users with the OAuth two password flow by validating credentials, issuing an encoded token with user data, and using it in request headers to access protected routes.
+
+Password Request Form
+8:20
+Verify Password
+2:18
+Verify the seller's password by comparing the plain input to the stored hash after confirming email; raise an http exception on mismatch, and encode verified seller data into a token.
+
+JWT
+14:04
+Generate and validate a JWT for seller authentication using PyJWT, encoding a payload with user data, header, and signature, and enforce expiry via exp and environment variables.
+
+Password Flow
+1:37
+Protect api endpoints by validating access tokens in the authorization header using jwt and a secret key, then decode the token to identify the user in FastAPI.
+
+OAuth2 Scheme
+7:29
+Learn how to protect a dashboard endpoint with OAuth2 password bearer by wiring a token URL as a dependency, obtaining and using the access token via the authorization header.
+
+Decode JWT
+9:50
+Generate and decode JWT tokens using a utils module, signing payloads with a secret key and expiry, and validate tokens to authenticate users via fastapi endpoints.
+
+Identify User
+3:48
+Identify the authenticated user from the access token by decoding its data, fetch the seller by id with a session get, and implement a dependency for user identification across endpoints.
+
+User Dependency
+5:50
+Protect routes with oauth2 password flow as a dependency, validate the access token, and fetch the current seller from token data using a database session.
+
+Token Expiry
+4:56
+Explore implementing access token expiration with JWT by enforcing UTC timestamps, decoding tokens, and handling invalid or expired tokens to protect endpoints and require re-login.
+
+API Client Authentication
+1:58
+Authenticate using the authorization header and OAuth 2 password bearer flow to fetch an access token in a SQL API client and automatically include it in requests.
+
+HTTP Bearer
+7:00
+Protect endpoints by applying the oauth2 password bearer scheme, extracting and validating the access token from the authorization header, and enforcing 401 on invalid tokens.
+
+Logout User
+
+Overview
+2:14
+Learn to authenticate users with access tokens, attach a unique ID to each token, invalidate them on logout via a blacklist, and use Redis with FastAPI.
+
+Identify JWT
+4:21
+Create a logout endpoint that invalidates the access token by extracting the JWT token id (jti), generating a unique id with uuid4, and storing it in a blacklist database.
+
+Redis
+11:25
+Set up Redis and RedisAI, connect from Python, and build a token blacklist using key value pairs across databases. Verify with ping, exists checks, and optional async IO for performance.
+
+Token Blacklist
+6:27
+SQL Relations
+
+Overview
+1:34
+Foreign Keys
+7:12
+UUID
+5:24
+Relate User
+3:28
+Debugging
+2:08
+Alembic Data Migrations
+
+Setup
+5:32
+Revision Script
+10:51
+Autogenerate Revision
+3:46
+Delivery Partner
+
+Overview
+0:51
+Database Model
+12:40
+Partner Endpoints
+8:57
+Base Service
+16:27
+User Service
+14:13
+Debugging
+8:46
+Shipment Event
+
+Overview
+1:30
+Event Model
+10:11
+Service Layer
+13:14
+Event Timeline
+11:51
+Debugging Endpoints
+4:19
+Cancel Shipment
+6:24
+Send Mail
+
+Mail Client Setup
+8:01
+Event Updates
+13:28
+Background Tasks
+6:03
+Mail Template
+11:43
+Customer Response
+
+HTML Response
+6:34
+Template Response
+17:49
+Response Class
+13:10
+Email Confirmation
+
+Overview
+2:55
+URL Safe Token
+9:37
+Registration Email
+6:45
+Verify Endpoint
+7:39
+Password Reset
+
+Overview
+9:40
+Reset Endpoint
+7:59
+Password Reset Form
+13:14
+SMS
+
+Overview
+1:22
+Twilio Setup
+5:34
+Send SMS
+7:05
+Verification Code
+7:48
+Review
+
+Overview
+1:06
+Review Model
+4:04
+Review Link
+2:29
+Endpoints
+4:56
+HTML Form
+9:19
+Salary
+
+Overview
+2:22
+Background Worker
+13:21
+Task Function
+4:34
+Flower Monitoring
+9:35
+Many-to-Many
+
+Overview
+1:53
+Link Model
+8:26
+Shipment Tags
+9:19
+Tagged Shipments
+3:13
+Extra Fields
+9:24
+Error Handling
+
+Exception
+10:34
+Add Handlers
+9:57
+Other Exceptions
+5:58
+API Middlewares
+
+Add Middleware
+9:25
+CORS Middleware
+5:41
+API Documentation
+
+General Metadata
+9:40
+Endpoint Metadata
+7:26
+Model Metadata
+4:34
+PyTest
+
+Write Test
+3:59
+Run Test
+5:07
+Test State Example
+3:41
+Pytest Fixture
+6:26
+Fixture Scope
+3:27
+API Testing
+
+Test Endpoint
+11:31
+Async Test
+6:18
+Override Dependency
+6:31
+Test Database
+13:46
+Authentication
+10:57
+Automate Testing
+3:10
+ReactJS
+
+Overview
+1:59
+Setup
+6:43
+Component State
+14:47
+Forms
+15:44
+Context Provider
+15:43
+Axios Client
+12:04
+Swagger Typescript API
+7:18
+Tanstack React Query
+8:57
+Front End
+
+Setup
+8:41
+Login Page
+22:00
+Route Authentication
+8:41
+User Type
+14:16
+Dashboard Page
+12:17
+Account Page
+5:55
+Submit Shipment Page
+8:24
+Update Shipment Page
+8:24
+QR Scanning
+14:02
+Docker
+
+Introduction
+2:44
+Docker Containers
+15:24
+API Server
+14:56
+PostgreSQL Database
+11:08
+Docker Compose
+11:32
+Backend
+6:31
+Deployment
+
+Render
+1:02
+PostgreSQL & Redis
+4:49
+Web Service
+8:34
+API Gateway
+
+Introduction
+1:34
+AWS CLI Setup
+2:26
+AWS Elastic Container Registry
+4:51
+AWS App Runner
+3:58
+AWS API Gateway
+13:49
+Caching
+4:42
+Tips and Tricks
+
+File Structure
+3:45
+Pagination
+13:52
+Logging
+11:01
+Bonus Lecture
+END

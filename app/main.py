@@ -4,6 +4,8 @@ from sqlmodel import SQLModel
 
 from app.books.router import book_router
 from app.database import engine
+from app.users.router import user_router
+from app.borrows.router import borrow_router
 
 @asynccontextmanager
 async def lifespan(app:FastAPI):
@@ -16,6 +18,7 @@ app=FastAPI(
     version="1.0.0",
     lifespan=lifespan
 )
-app.include_router(book_router)
 
-    
+app.include_router(book_router)
+app.include_router(user_router)
+app.include_router(borrow_router)

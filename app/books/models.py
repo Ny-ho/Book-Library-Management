@@ -1,5 +1,5 @@
 #this is what our database table should look like
-
+#SQLMODEL Database Table(ORM)
 from typing import Optional
 from sqlmodel import SQLModel,Field
 
