@@ -1,4 +1,3 @@
-from rich.live import select_exchange
 from datetime import datetime
 from sqlmodel import Session,select
 from app.borrows.models import BorrowRecord
@@ -6,8 +5,8 @@ from app.borrows.schemas import BorrowResponse,BorrowCreate
 from app.books.models import Book
 
 class BorrowService:
-    @staticmethod #why
-    def get_all_borrows(session:Session): #ehy sessions
+    @staticmethod 
+    def get_all_borrows(session:Session):
         statement=select(BorrowRecord)
         return session.exec(statement).all()
     @staticmethod

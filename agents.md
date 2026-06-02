@@ -1,6 +1,5 @@
 remember this is not a huge scale webapp, it is just for the interviewer.
 Preference: DONOT EDIT or change files and codes by yourself unluess i specifically ask you to.However you(ai) have permission to view and read the files and codes anytime without the need to ask me for permission.
-i am not closing this chat/convo so no need to push everything at once.
 if code is huge,divide the code into parts and explain line by line . 
 
 # Milestone 2: Core Library Database API (SQLite & SQLModel)
