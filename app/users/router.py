@@ -6,6 +6,7 @@ from app.database import get_session
 from app.users.models import User
 from app.users.service import UserService
 from app.users.schemas import UserCreate, UserResponse
+# from app.auth.dependencies import get_current_user  # JWT disabled for now
 
 user_router = APIRouter(prefix="/users", tags=["users"])
 
@@ -25,6 +26,9 @@ def create_user(user_data: UserCreate, session: Session = Depends(get_session)):
 @user_router.get("/", response_model=List[UserResponse])
 def get_all_users(session: Session = Depends(get_session)):
     return UserService.get_all_users(session)
+# @user_router.get("/me", response_model=UserResponse)
+# def read_users_me(current_user: User = Depends(get_current_user)):
+#     return current_user
 
 @user_router.get("/{user_id}", response_model=UserResponse)
 def get_user(user_id: int, session: Session = Depends(get_session)):

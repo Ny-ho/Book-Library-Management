@@ -1,0 +1,16 @@
+:root {
+  --color-bg: #0f1419;
+  --color-surface: #1a2332;
+  --color-surface-elevated: #243044;
+  --color-border: #2d3a4f;
+  --color-text: #e8edf4;
+  --color-text-muted: #8b9cb3;
+  --color-accent: #c9a227;
+  --color-accent-hover: #ddb83a;
+  --color-success: #3d9a6a;
+  --color-danger: #c45c5c;
+  --font-sans: "Segoe UI", system-ui, -apple-system, sans-serif;
+  --radius: 10px;
+  --shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
+  --sidebar-width: 220px;
+}

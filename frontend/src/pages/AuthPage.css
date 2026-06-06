@@ -1,0 +1,23 @@
+.auth-page__google {
+  margin-top: 0.5rem;
+  width: 100%;
+  max-width: 320px;
+}
+
+.auth-page__google-icon {
+  display: inline-flex;
+  width: 1.25rem;
+  height: 1.25rem;
+  align-items: center;
+  justify-content: center;
+  background: #fff;
+  color: #4285f4;
+  border-radius: 4px;
+  font-weight: 700;
+  font-size: 0.85rem;
+}
+
+.auth-page__hint {
+  margin-top: 1.25rem;
+  font-size: 0.85rem;
+}

@@ -36,17 +36,17 @@ def borrow_book (borrow_data:BorrowCreate,session:Session=Depends(get_session)):
 def get_all_borrows(session:Session=Depends(get_session)):
     return BorrowService.get_all_borrows(session)
 
-@borrow_router.post("/{borrow_id}/return")
-def return_book(borrow_id:int,session:Session=Depends(get_session)):
-    db_borrow=BookService.get_book_by_id(session,borrow_id)
+@borrow_router.post("/{borrow_id}/return", response_model=BorrowResponse)
+def return_book(borrow_id: int, session: Session = Depends(get_session)):
+    db_borrow = BorrowService.get_borrow_by_id(session, borrow_id)
     if not db_borrow:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"the book of id {borrow_id} is not found"
+            detail=f"Borrow record with id {borrow_id} not found",
         )
-    if db_borrow is not None:
+    if db_borrow.return_date is not None:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"This book has been already returned"
+            detail="This borrow has already been returned",
         )
-    return BorrowService.return_book(session,db_borrow)
+    return BorrowService.return_book(session, db_borrow)
