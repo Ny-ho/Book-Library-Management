@@ -7,5 +7,6 @@ class Settings(BaseSettings):
     model_config=SettingsConfigDict(env_file=".env",extra="ignore")
     SECRET_KEY:str
     ACCESS_TOKEN_EXPIRE_MINUTES:int=30
+    GOOGLE_CLIENT_ID:str#inside settings so it(pydantic) reads from .env
 settings=Settings()
 

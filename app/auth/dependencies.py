@@ -1,4 +1,7 @@
 #This file is only for “who is logged in?” — not login, not hashing.
+#utils.py contains the tools
+#dependencies.py is the active security guard who stands at the door and actually uses that tool every single time a request comes in.
+
 from email.message import _PayloadType
 from fastapi import Depends, HTTPException,status
 from fastapi.security import OAuth2PasswordBearer #opposite of login , this extracts token

@@ -12,11 +12,11 @@ class UserService:
         return sess.get(User,user_id)
     @staticmethod#function with password hah
     def create_user(sess:Session,user_data:UserCreate):
-        hashed=hash_password(user_data.password)
+        hashed=hash_password(user_data.password) #pw hash
         db_user=User(
             username=user_data.username,
             email=user_data.email,
-            password_hash=hashed,
+            password_hash=hashed, #pw hash
             role=user_data.role
         )
         sess.add(db_user)

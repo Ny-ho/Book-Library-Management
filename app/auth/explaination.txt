@@ -1,0 +1,14 @@
+The Big Picture: The Difference Roles
+The confusion comes from mixing up The Front Gate (how a user logs in) with The Internal Checkpoints (how a logged-in user moves around your app).
+
+Google OAuth is only used at the Front Gate. It runs exactly once when the user clicks "Login with Google". Once your backend verifies their Google token and finds them in your database, Google's job is done.
+
+Your Custom JWT System is used at the Internal Checkpoints. Your backend wraps the user's ID into your own app's custom JWT passport. For the rest of the session, whenever the user clicks buttons to borrow books or view profiles, your backend ignores Google completely and just verifies your own custom passport.
+
+utils.py holds the math formulas, router.py handles the login gates, and dependencies.py holds the guards protecting your secure data endpoints. They are the trifecta of a secure FastAPI backend.
+
+so router schema utils dependencires . so router deos the verification with google(not does but method to interact) and has method which does like takes incoming jtw and gives jwt . schemas is just for proper format/shape of token for aoogleoauthreq(incoming) and token is for outgoing from backend. utils doesnt concern with url and others (routers does that) it contains raw math . dependecies is only for securyt guard like this is what checks the jwt token from user browser or future request. fill every single line and concern of mine 
+
+When the user goes to a completely different file—like your books/router.py or borrows/router.py—and clicks a secure button, the Dependencies file wakes up:
+
+Inside your UserService.create_user function, the service layer realizes, "Uh oh, this password is raw text. I need to scramble it before saving it." So, your service layer calls utils.py which immediately returns that scrambled string back to service.py and wipes its own memory. It never touches a database.

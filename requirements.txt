@@ -4,3 +4,4 @@ sqlmodel
 pydantic-settings
 passlib[bcrypt]
 python-jose[cryptography]
+google-auth
