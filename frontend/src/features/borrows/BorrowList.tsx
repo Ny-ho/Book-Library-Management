@@ -1,5 +1,6 @@
 import type { Borrow } from "../../types/borrow";
 import { EmptyState } from "../../components/ui/EmptyState";
+import { Button } from "../../components/ui/Button";
 
 function fmt(iso: string | null) {
   if (!iso) return "—";
@@ -8,9 +9,11 @@ function fmt(iso: string | null) {
 
 interface BorrowListProps {
   borrows: Borrow[];
+  onReturn?: (borrowId: number) => Promise<void>;
+  returningId?: number | null;
 }
 
-export function BorrowList({ borrows }: BorrowListProps) {
+export function BorrowList({ borrows, onReturn, returningId }: BorrowListProps) {
   if (borrows.length === 0) {
     return <EmptyState message="No borrows yet." />;
   }
@@ -36,7 +39,21 @@ export function BorrowList({ borrows }: BorrowListProps) {
               <td>{b.book_id}</td>
               <td>{fmt(b.borrow_date)}</td>
               <td>{fmt(b.due_date)}</td>
-              <td>{fmt(b.return_date)}</td>
+              <td>
+                {b.return_date ? (
+                  fmt(b.return_date)
+                ) : onReturn ? (
+                  <Button
+                    variant="secondary"
+                    disabled={returningId === b.id}
+                    onClick={() => onReturn(b.id)}
+                  >
+                    {returningId === b.id ? "Returning…" : "Return"}
+                  </Button>
+                ) : (
+                  "Not returned"
+                )}
+              </td>
             </tr>
           ))}
         </tbody>

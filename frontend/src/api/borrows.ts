@@ -11,3 +11,9 @@ export function createBorrow(data: BorrowCreate) {
     body: JSON.stringify(data),
   });
 }
+
+export function returnBook(borrowId: number) {
+  return apiRequest<Borrow>(`/borrows/${borrowId}/return`, {
+    method: "POST",
+  });
+}

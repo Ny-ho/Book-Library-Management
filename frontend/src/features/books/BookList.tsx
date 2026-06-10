@@ -36,7 +36,7 @@ export function BookList({ books, onDelete, deletingId }: BookListProps) {
               <td>
                 <span
                   className={
-                    book.status === "available"
+                    book.status.toLowerCase() === "available"
                       ? "badge badge--ok"
                       : "badge badge--busy"
                   }

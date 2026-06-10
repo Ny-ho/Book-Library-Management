@@ -7,7 +7,7 @@ from app.books.router import book_router
 from app.database import engine
 from app.users.router import user_router
 from app.borrows.router import borrow_router
-# from app.auth.router import auth_router  # JWT/login disabled for now
+from app.auth.router import auth_router
 
 @asynccontextmanager
 async def lifespan(app:FastAPI):
@@ -32,4 +32,4 @@ app.add_middleware(
 app.include_router(book_router)
 app.include_router(user_router)
 app.include_router(borrow_router)
-# app.include_router(auth_router)  # JWT/login disabled for now
+app.include_router(auth_router)  # JWT/login disabled for now

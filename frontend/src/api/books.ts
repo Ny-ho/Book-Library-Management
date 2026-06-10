@@ -15,3 +15,7 @@ export function createBook(data: BookCreate) {
 export function deleteBook(id: number) {
   return apiRequest<void>(`/books/${id}`, { method: "DELETE" });
 }
+
+export function fetchBookById(id: number) {
+  return apiRequest<Book>(`/books/${id}`);
+}

@@ -1,15 +1,17 @@
 import { NavLink } from "react-router-dom";
 import "./Sidebar.css";
 
-const links = [
-  { to: "/", label: "Home", end: true },
-  { to: "/books", label: "Books" },
-  { to: "/users", label: "Users" },
-  { to: "/borrows", label: "Borrows" },
-  { to: "/auth", label: "Sign in" },
-];
-
 export function Sidebar() {
+  const isLoggedIn = !!localStorage.getItem("token");
+
+  const links = [
+    { to: "/", label: "Home", end: true },
+    { to: "/books", label: "Books" },
+    { to: "/users", label: "Users" },
+    { to: "/borrows", label: "Borrows" },
+    { to: "/auth", label: isLoggedIn ? "Sign out" : "Sign in" },
+  ];
+
   return (
     <aside className="sidebar">
       <div className="sidebar__brand">
