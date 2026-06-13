@@ -7,7 +7,7 @@ import { Button } from "../components/ui/Button";
 import { BookForm } from "../features/books/BookForm";
 import { BookList } from "../features/books/BookList";
 import type { Book } from "../types/book";
-import { useAuthAction } from "../hooks/useAuthAction";
+import { useAuthAction } from "../hooks/useAuthAction"; // 🚀 Import your hook
 
 export function BooksPage() {
   const [books, setBooks] = useState<Book[]>([]);
@@ -22,7 +22,7 @@ export function BooksPage() {
   const [searchError, setSearchError] = useState<string | null>(null);
   const [searching, setSearching] = useState(false);
 
-  const { executeSecureAction } = useAuthAction();
+  const { executeSecureAction } = useAuthAction(); // 🚀 Initialize the hook
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -41,6 +41,7 @@ export function BooksPage() {
   }, [load]);
 
   async function handleCreate(data: Parameters<typeof createBook>[0]) {
+    // 🔒 Intercept submission if the guest isn't signed in
     executeSecureAction(async () => {
       setError(null);
       setSuccess(null);
@@ -58,6 +59,7 @@ export function BooksPage() {
   async function handleDelete(id: number) {
     if (!confirm("Delete this book?")) return;
     
+    // 🔒 Intercept deletion if the guest isn't signed in
     executeSecureAction(async () => {
       setDeletingId(id);
       setError(null);
@@ -142,7 +144,7 @@ export function BooksPage() {
       </div>
 
       <Card title="Catalog">
-        <BookList books={books} onDelete={handleDelete} deletingId={deletingId} />
+        {loading ? <p>Loading…</p> : <BookList books={books} onDelete={handleDelete} deletingId={deletingId} />}
       </Card>
     </>
   );

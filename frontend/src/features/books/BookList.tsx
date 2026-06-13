@@ -95,15 +95,7 @@ export function BookList({ books, onDelete, deletingId }: BookListProps) {
                     {book.status}
                   </span>
                 </td>
-                <td>
-                  <Button
-                    variant="danger"
-                    disabled={deletingId === book.id}
-                    onClick={() => onDelete(book.id)}
-                  >
-                    Delete
-                  </Button>
-                </td>
+
               </tr>
             );
           })}
@@ -112,3 +104,4 @@ export function BookList({ books, onDelete, deletingId }: BookListProps) {
     </div>
   );
 }
+//
