@@ -10,3 +10,4 @@ class Book(SQLModel,table=True):
     category:str
     isbn:str=Field(unique=True)
     status:str=Field(default="available")
+    image_url:Optional[str]=Field(default=None)

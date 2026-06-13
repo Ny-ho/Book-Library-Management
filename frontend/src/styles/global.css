@@ -68,3 +68,37 @@ th {
   text-transform: uppercase;
   letter-spacing: 0.06em;
 }
+
+/* ==========================================================================
+   Dashboard Edge-to-Edge Layout Fix
+   ========================================================================== */
+
+.app-shell {
+  display: flex;
+  width: 100vw;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+.app-shell__main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  width: 100%;
+}
+
+.app-shell__content {
+  flex: 1;
+  padding: 1.5rem;
+  width: 100%;
+  
+  /* 🔥 Overrides any hardcoded layout width constraint and stretches components to the edge */
+  max-width: none !important; 
+}
+
+/* Ensure our catalog components fill the newly gained horizontal space */
+.table-wrap {
+  width: 100%;
+  overflow-x: auto;
+}

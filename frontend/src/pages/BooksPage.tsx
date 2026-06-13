@@ -7,6 +7,7 @@ import { Button } from "../components/ui/Button";
 import { BookForm } from "../features/books/BookForm";
 import { BookList } from "../features/books/BookList";
 import type { Book } from "../types/book";
+import { useAuthAction } from "../hooks/useAuthAction";
 
 export function BooksPage() {
   const [books, setBooks] = useState<Book[]>([]);
@@ -20,6 +21,8 @@ export function BooksPage() {
   const [searchedBook, setSearchedBook] = useState<Book | null>(null);
   const [searchError, setSearchError] = useState<string | null>(null);
   const [searching, setSearching] = useState(false);
+
+  const { executeSecureAction } = useAuthAction();
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -38,30 +41,35 @@ export function BooksPage() {
   }, [load]);
 
   async function handleCreate(data: Parameters<typeof createBook>[0]) {
-    setError(null);
-    setSuccess(null);
-    try {
-      await createBook(data);
-      setSuccess("Book added.");
-      await load();
-    } catch (e) {
-      setError(e instanceof ApiError ? e.detail : "Failed to add book");
-      throw e;
-    }
+    executeSecureAction(async () => {
+      setError(null);
+      setSuccess(null);
+      try {
+        await createBook(data);
+        setSuccess("Book added.");
+        await load();
+      } catch (e) {
+        setError(e instanceof ApiError ? e.detail : "Failed to add book");
+        throw e;
+      }
+    });
   }
 
   async function handleDelete(id: number) {
     if (!confirm("Delete this book?")) return;
-    setDeletingId(id);
-    setError(null);
-    try {
-      await deleteBook(id);
-      await load();
-    } catch (e) {
-      setError(e instanceof ApiError ? e.detail : "Failed to delete");
-    } finally {
-      setDeletingId(null);
-    }
+    
+    executeSecureAction(async () => {
+      setDeletingId(id);
+      setError(null);
+      try {
+        await deleteBook(id);
+        await load();
+      } catch (e) {
+        setError(e instanceof ApiError ? e.detail : "Failed to delete");
+      } finally {
+        setDeletingId(null);
+      }
+    });
   }
 
   async function handleFindBook(e: React.FormEvent) {
@@ -96,7 +104,7 @@ export function BooksPage() {
         
         <Card title="Find Book by ID">
           <form onSubmit={handleFindBook} style={{ display: "flex", gap: "0.5rem", alignItems: "flex-end" }}>
-            <label style={{ flex: 1, margin: 0 }}>
+            <label style={{ display: "flex", flexDirection: "column", gap: "0.5rem", flex: 1, margin: 0 }}>
               Book ID
               <input
                 type="number"
@@ -134,7 +142,7 @@ export function BooksPage() {
       </div>
 
       <Card title="Catalog">
-        {loading ? <p>Loading…</p> : <BookList books={books} onDelete={handleDelete} deletingId={deletingId} />}
+        <BookList books={books} onDelete={handleDelete} deletingId={deletingId} />
       </Card>
     </>
   );

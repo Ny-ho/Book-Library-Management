@@ -1,10 +1,10 @@
-import { useState, type FormEvent } from "react";
+import { useState, useEffect, type FormEvent } from "react";
 import type { BookCreate } from "../../types/book";
 import { Button } from "../../components/ui/Button";
 import "./forms.css";
 
 interface BookFormProps {
-  onSubmit: (data: BookCreate) => Promise<void>;
+  onSubmit: (data: FormData) => Promise<void>;  // <-- Change type to FormData
 }
 
 function generateRandomIsbn(): string {
@@ -13,25 +13,41 @@ function generateRandomIsbn(): string {
 }
 
 export function BookForm({ onSubmit }: BookFormProps) {
-  const [form, setForm] = useState<BookCreate>({
+  const [form, setForm] = useState({
     title: "",
     author: "",
     category: "",
     isbn: generateRandomIsbn(),
   });
+  const [imageFile, setImageFile] = useState<File | null>(null); // State to hold selected file
   const [saving, setSaving] = useState(false);
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
     setSaving(true);
     try {
-      await onSubmit(form);
+      // Create multipart FormData container
+      const formData = new FormData();
+      formData.append("title", form.title);
+      formData.append("author", form.author);
+      formData.append("category", form.category);
+      formData.append("isbn", form.isbn);
+      if (imageFile) {
+        formData.append("image", imageFile);  // Append the selected file
+      }
+
+      await onSubmit(formData);
+      
+      // Reset form
       setForm({
         title: "",
         author: "",
         category: "",
         isbn: generateRandomIsbn(),
       });
+      setImageFile(null);
+      const fileInput = document.getElementById("book-image") as HTMLInputElement;
+      if (fileInput) fileInput.value = "";
     } finally {
       setSaving(false);
     }
@@ -80,6 +96,15 @@ export function BookForm({ onSubmit }: BookFormProps) {
             Generate
           </Button>
         </div>
+      </label>
+      <label>
+        Book Cover Image (Optional)
+        <input
+          id="book-image"
+          type="file"
+          accept="image/*"
+          onChange={(e) => setImageFile(e.target.files?.[0] || null)}
+        />
       </label>
       <div className="form-grid__actions">
         <Button type="submit" disabled={saving}>

@@ -1,3 +1,4 @@
+from os import name
 from fastapi import FastAPI
 from contextlib import asynccontextmanager
 from sqlmodel import SQLModel
@@ -21,6 +22,12 @@ app=FastAPI(
     version="1.0.0",
     lifespan=lifespan
 )
+
+import os
+from fastapi.staticfiles import StaticFiles
+os.makedirs("static/books",exist_ok=True)
+app.mount("/static",StaticFiles(directory="static"),name="static")
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["http://localhost:5173", "http://127.0.0.1:5173"],

@@ -56,7 +56,15 @@ export function BorrowForm({ users, books, currentUser, onSubmit }: BorrowFormPr
   return (
     <form className="form-grid" onSubmit={handleSubmit}>
       {currentUser ? (
-        <div style={{ gridColumn: "span 2", marginBottom: "0.5rem", padding: "0.75rem", background: "var(--color-bg-alt, #f8f9fa)", borderRadius: "var(--radius)", border: "1px solid var(--color-border)" }}>
+        <div style={{ 
+          gridColumn: "span 2", 
+          marginBottom: "0.5rem", 
+          padding: "0.75rem", 
+          background: "var(--color-bg-alt, #f8f9fa)", 
+          borderRadius: "var(--radius)", 
+          border: "1px solid var(--color-border)",
+          color: "#111827" /* Force dark text color inside the white box */
+        }}>
           <strong>Borrowing as:</strong> {currentUser.username} ({currentUser.email})
         </div>
       ) : (

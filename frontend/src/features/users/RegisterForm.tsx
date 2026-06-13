@@ -1,76 +1,71 @@
-import { useState, type FormEvent } from "react";
-import type { UserCreate } from "../../types/user";
-import { Button } from "../../components/ui/Button";
+import type { User } from "../../types/user";
 import "../books/forms.css";
 
-interface RegisterFormProps {
-  onSubmit: (data: UserCreate) => Promise<void>;
+interface ProfileDisplayProps {
+  currentUser: User | null; 
 }
 
-export function RegisterForm({ onSubmit }: RegisterFormProps) {
-  const [form, setForm] = useState<UserCreate>({
-    username: "",
-    email: "",
-    password: "",
-    role: "user",
-  });
-  const [saving, setSaving] = useState(false);
-
-  async function handleSubmit(e: FormEvent) {
-    e.preventDefault();
-    setSaving(true);
-    try {
-      await onSubmit(form);
-      setForm({ username: "", email: "", password: "", role: "user" });
-    } finally {
-      setSaving(false);
-    }
+export function RegisterForm({ currentUser }: ProfileDisplayProps) {
+  if (!currentUser) {
+    return <div className="p-4">Loading profile information...</div>;
   }
 
   return (
-    <form className="form-grid" onSubmit={handleSubmit}>
-      <label>
+    /* 🚀 We wrap the grid structure with inline styles to force a perfectly aligned 3-column system */
+    <div className="form-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "16px", width: "100%" }}>
+      
+      {/* Row 1, Column 1: Username */}
+      <label style={{ gridColumn: "span 1" }}>
         Username
         <input
-          required
-          value={form.username}
-          onChange={(e) => setForm({ ...form, username: e.target.value })}
+          type="text"
+          readOnly
+          disabled
+          value={`YOU: ${currentUser.username}`}
+          style={{ cursor: "not-allowed", opacity: 0.8, width: "100%" }}
         />
       </label>
-      <label>
+      
+      {/* Row 1, Column 2 & 3: Email spans across the remaining 2/3rds of the card layout */}
+      <label style={{ gridColumn: "span 2" }}>
         Email
         <input
           type="email"
-          required
-          value={form.email}
-          onChange={(e) => setForm({ ...form, email: e.target.value })}
+          readOnly
+          disabled
+          value={currentUser.email}
+          style={{ cursor: "not-allowed", opacity: 0.8, width: "100%" }}
         />
       </label>
-      <label>
+      
+      {/* Row 2, Column 1 & 2: Password spans 2 parts, giving the long description plenty of breathing room */}
+      <label style={{ gridColumn: "span 2" }}>
         Password
         <input
-          type="password"
-          required
-          minLength={6}
-          value={form.password}
-          onChange={(e) => setForm({ ...form, password: e.target.value })}
+          type="text"
+          readOnly
+          disabled
+          value="(Randomly generated and securely hashed)"
+          style={{ 
+            cursor: "not-allowed", 
+            opacity: 0.8, 
+            fontStyle: "italic", 
+            width: "100%" /* 🚀 Fills its 2-column wide block entirely */
+          }}
         />
       </label>
-      <label>
+      
+      {/* Row 2, Column 3: Role stays on the same line to completely snap and fill the remaining right side gap! */}
+      <label style={{ gridColumn: "span 1" }}>
         Role
-        <select
-          value={form.role}
-          onChange={(e) => setForm({ ...form, role: e.target.value })}
-        >
-          <option value="user">user</option>
-          <option value="admin">admin</option>
-        </select>
+        <input
+          type="text"
+          readOnly
+          disabled
+          value={currentUser.role}
+          style={{ cursor: "not-allowed", opacity: 0.8, width: "100%" }}
+        />
       </label>
-      <div className="form-grid__actions">
-        <Button type="submit" disabled={saving}>
-          {saving ? "Registering…" : "Register user"}
-        </Button>
-      </div>
-    </form>
+    </div>
   );
 }

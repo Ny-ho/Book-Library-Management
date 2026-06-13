@@ -1,23 +1,37 @@
 import { useCallback, useEffect, useState } from "react";
-import { createUser, fetchUsers } from "../api/users";
+import { fetchUsers } from "../api/users"; // ❌ Removed createUser API import
 import { ApiError } from "../api/client";
 import { Alert } from "../components/ui/Alert";
 import { Card } from "../components/ui/Card";
 import { RegisterForm } from "../features/users/RegisterForm";
 import { UserList } from "../features/users/UserList";
 import type { User } from "../types/user";
+import { getCurrentUser } from "../api/auth";
+
+// NOTE: If you are using an auth context, import your hook here. 
+// For example: import { useAuth } from "../hooks/useAuth";
 
 export function UsersPage() {
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+  
+  // 1. Change this from a hardcoded object to start as null 
+  const [currentUser, setCurrentUser] = useState<User | null>(null);
 
   const load = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
-      setUsers(await fetchUsers());
+      // 2. Fetch the catalog users and the actual logged-in user at the same time
+      const [allUsers, activeUser] = await Promise.all([
+        fetchUsers(),
+        getCurrentUser().catch(() => null) // Fallback to null if not logged in
+      ]);
+      
+      setUsers(allUsers);
+      setCurrentUser(activeUser); // 3. Save the actual user payload to state
     } catch (e) {
       setError(e instanceof ApiError ? e.detail : "Failed to load users");
     } finally {
@@ -29,19 +43,7 @@ export function UsersPage() {
     void load();
   }, [load]);
 
-  async function handleRegister(data: Parameters<typeof createUser>[0]) {
-    setError(null);
-    setSuccess(null);
-    try {
-      await createUser(data);
-      setSuccess("User registered.");
-      await load();
-    } catch (e) {
-      setError(e instanceof ApiError ? e.detail : "Registration failed");
-      throw e;
-    }
-  }
-
+  // ... rest of your return statement stays exactly the same
   return (
     <>
       {error ? <Alert variant="error" onDismiss={() => setError(null)}>{error}</Alert> : null}
@@ -50,9 +52,13 @@ export function UsersPage() {
           {success}
         </Alert>
       ) : null}
-      <Card title="Register member">
-        <RegisterForm onSubmit={handleRegister} />
+      
+      {/* 🔄 Changed Title from "Register member" to "Your Profile" */}
+      <Card title="Your Profile">
+        {/* 🚀 Passing the logged-in user data down into your read-only profile template */}
+        <RegisterForm currentUser={currentUser} />
       </Card>
+      
       <Card title="Members">
         {loading ? <p>Loading…</p> : <UserList users={users} />}
       </Card>

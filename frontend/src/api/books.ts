@@ -5,12 +5,13 @@ export function fetchBooks() {
   return apiRequest<Book[]>("/books/");
 }
 
-export function createBook(data: BookCreate) {
+export function createBook(data: FormData) {
   return apiRequest<Book>("/books/", {
     method: "POST",
-    body: JSON.stringify(data),
+    body: data,
   });
 }
+
 
 export function deleteBook(id: number) {
   return apiRequest<void>(`/books/${id}`, { method: "DELETE" });

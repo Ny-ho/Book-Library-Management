@@ -11,6 +11,7 @@ import { BorrowList } from "../features/borrows/BorrowList";
 import type { Borrow } from "../types/borrow";
 import type { Book } from "../types/book";
 import type { User } from "../types/user";
+import { useAuthAction } from "../hooks/useAuthAction"; // 🚀 Import your hook
 
 export function BorrowsPage() {
   const [borrows, setBorrows] = useState<Borrow[]>([]);
@@ -22,20 +23,29 @@ export function BorrowsPage() {
   const [success, setSuccess] = useState<string | null>(null);
   const [returningId, setReturningId] = useState<number | null>(null);
 
+  const { executeSecureAction } = useAuthAction(); // 🚀 Initialize the hook
+
   const load = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
-      const [b, u, bk, curr] = await Promise.all([
+      // 🛡️ Split up calls so if fetch data succeeds but user is unauthenticated, the page still renders
+      const [b, u, bk] = await Promise.all([
         fetchBorrows(),
         fetchUsers(),
         fetchBooks(),
-        getCurrentUser(),
       ]);
       setBorrows(b);
       setUsers(u);
       setBooks(bk);
-      setCurrentUser(curr);
+
+      try {
+        const curr = await getCurrentUser();
+        setCurrentUser(curr);
+      } catch {
+        setCurrentUser(null); // Silent catch for guest views
+      }
+
     } catch (e) {
       setError(e instanceof ApiError ? e.detail : "Failed to load data");
     } finally {
@@ -48,31 +58,37 @@ export function BorrowsPage() {
   }, [load]);
 
   async function handleBorrow(data: Parameters<typeof createBorrow>[0]) {
-    setError(null);
-    setSuccess(null);
-    try {
-      await createBorrow(data);
-      setSuccess("Borrow created.");
-      await load();
-    } catch (e) {
-      setError(e instanceof ApiError ? e.detail : "Borrow failed");
-      throw e;
-    }
+    // 🔒 Intercept execution if the user is a guest
+    executeSecureAction(async () => {
+      setError(null);
+      setSuccess(null);
+      try {
+        await createBorrow(data);
+        setSuccess("Borrow created.");
+        await load();
+      } catch (e) {
+        setError(e instanceof ApiError ? e.detail : "Borrow failed");
+        throw e;
+      }
+    });
   }
 
   async function handleReturn(borrowId: number) {
-    setReturningId(borrowId);
-    setError(null);
-    setSuccess(null);
-    try {
-      await returnBook(borrowId);
-      setSuccess("Book returned successfully.");
-      await load();
-    } catch (e) {
-      setError(e instanceof ApiError ? e.detail : "Failed to return book");
-    } finally {
-      setReturningId(null);
-    }
+    // 🔒 Intercept execution if the user is a guest
+    executeSecureAction(async () => {
+      setReturningId(borrowId);
+      setError(null);
+      setSuccess(null);
+      try {
+        await returnBook(borrowId);
+        setSuccess("Book returned successfully.");
+        await load();
+      } catch (e) {
+        setError(e instanceof ApiError ? e.detail : "Failed to return book");
+      } finally {
+        setReturningId(null);
+      }
+    });
   }
 
   return (

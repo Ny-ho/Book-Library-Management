@@ -1,7 +1,12 @@
 #this sets up endpoints and maps them to service.py
+from sqlalchemy.orm import raiseload
+from sqlalchemy.orm import session
+import os
+import uuid
 from fastapi import APIRouter,Depends,HTTPException,status
+from fastapi import File,UploadFile,Form
 from sqlmodel import Session,select
-from typing import List
+from typing import List,Optional
 
 from app.database import get_session
 from app.books.models import Book
@@ -11,15 +16,52 @@ from app.books.service import BookService
 book_router=APIRouter(prefix="/books",tags=["books"])
 
 @book_router.post("/",response_model=BookResponse,status_code=status.HTTP_201_CREATED)
-def create_book(book_data:BookCreate,session:Session=Depends(get_session)):
-    existing_book=session.exec(select(Book).where(Book.isbn==book_data.isbn)).first()
+def create_book(
+    title:str=Form(...),
+    author:str=Form(...),
+    category:str=Form(...),
+    isbn:str=Form(...),
+    image:Optional[UploadFile]=File(default=None),#configures fastapi to accept and uploaded file
+    session:Session=Depends(get_session)
+):
+    existing_book=session.exec(select(Book).where(Book.isbn==isbn)).first()
     if existing_book:
-        raise HTTPException(
-            status_code=status.HTTP_409_CONFLICT,
-            detail=f"book with ISBN'{book_data.isbn}'already exists"
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT,detail=f"book with isbn '{isbn}' already exists")
+    
+    image_url=None
+    if image:#extract extension
+        file_ext=os.path.splitext(image.filename)[1] if image.filename else ".jpg"
 
-        )
+        #create uuid to prevent file overwrites
+        unique_filename=f"{uuid.uuid4()}{file_ext}"
+        filepath=os.path.join("static","books",unique_filename)
+
+        #save file contents to disk
+        with open(filepath,"wb") as buffer:
+            buffer.write(image.file.read())
+        #construct unique url path
+        image_url=f"/static/books/{unique_filename}"
+    book_data=BookCreate(
+        title=title,
+        author=author,
+        category=category,
+        isbn=isbn,
+        image_url=image_url
+
+    )
     return BookService.create_book(session,book_data)
+
+
+# @book_router.post("/",response_model=BookResponse,status_code=status.HTTP_201_CREATED)
+# def create_book(book_data:BookCreate,session:Session=Depends(get_session)):
+#     existing_book=session.exec(select(Book).where(Book.isbn==book_data.isbn)).first()
+#     if existing_book:
+#         raise HTTPException(
+#             status_code=status.HTTP_409_CONFLICT,
+#             detail=f"book with ISBN'{book_data.isbn}'already exists"
+
+#         )
+#     return BookService.create_book(session,book_data)
 @book_router.get("/",response_model=list[BookResponse])
 def get_all_books(session:Session=Depends(get_session)):
     return BookService.get_all_books(session)
@@ -42,3 +84,4 @@ def delete_book(book_id,session:Session=Depends(get_session)):
     BookService.delete_book(session,db_book)
     return None
 
+#for image adding
