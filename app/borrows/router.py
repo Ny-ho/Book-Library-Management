@@ -1,5 +1,7 @@
+from app.users.models import User
+from app.auth.dependencies import get_current_user
 from fastapi import APIRouter,Depends,HTTPException,status
-# from sqlmodel import Session
+from sqlmodel import select
 # from sqlalchemy.ext.asyncio import AsyncSession
 from sqlmodel.ext.asyncio.session import AsyncSession
 from typing import List
@@ -38,14 +40,23 @@ async def borrow_book (borrow_data:BorrowCreate,session:AsyncSession=Depends(get
 async def get_all_borrows(session:AsyncSession=Depends(get_session)):
     return await BorrowService.get_all_borrows(session)
 
-@borrow_router.post("/{borrow_id}/return", response_model=BorrowResponse)
-async def return_book(borrow_id: int, session: AsyncSession = Depends(get_session)):
+@borrow_router.post("/{borrow_id}/return", response_model=BorrowResponse,)
+async def return_book(borrow_id: int, session: AsyncSession = Depends(get_session),
+    current_user :User=Depends(get_current_user)
+):
     db_borrow = await BorrowService.get_borrow_by_id(session, borrow_id)
+    #EXPLICIT SQL QUERY: Go find the row where the borrow record's primary key matches the URL param
     if not db_borrow:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"Borrow record with id {borrow_id} not found",
         )
+    if db_borrow.user_id != current_user.id:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail=f"you cannot return a book borowwed by another user"
+        )
+    
     if db_borrow.return_date is not None:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
