@@ -5,8 +5,9 @@ interface UserListProps {
   users: User[];
 }
 
-export function UserList({ users }: UserListProps) {
-  if (users.length === 0) {
+export function UserList({ users = [] }: UserListProps) {
+  // 🛡️ Safe check: Validate that users is a defined array before checking length or rendering
+  if (!users || !Array.isArray(users) || users.length === 0) {
     return <EmptyState message="No users yet." />;
   }
 

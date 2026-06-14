@@ -1,17 +1,20 @@
-from sqlmodel import Session,select
+from sqlmodel import select
+# from sqlalchemy.ext.asyncio import AsyncSession
+from sqlmodel.ext.asyncio.session import AsyncSession
 from app.users.models import User
 from app.users.schemas import UserCreate
 from app.auth.utils import hash_password
 class UserService:
     @staticmethod
-    def get_all_users(sess:Session):
+    async def get_all_users(sess:AsyncSession):
         statement=select(User)
-        return sess.exec(statement).all()
+        result=await sess.exec(statement)
+        return result.all()
     @staticmethod
-    def get_user_by_id(sess:Session,user_id:int):
-        return sess.get(User,user_id)
+    async def get_user_by_id(sess:AsyncSession,user_id:int):
+        return await sess.get(User,user_id)
     @staticmethod#function with password hah
-    def create_user(sess:Session,user_data:UserCreate):
+    async def create_user(sess:AsyncSession,user_data:UserCreate):
         hashed=hash_password(user_data.password) #pw hash
         db_user=User(
             username=user_data.username,
@@ -20,15 +23,15 @@ class UserService:
             role=user_data.role
         )
         sess.add(db_user)
-        sess.commit()
-        sess.refresh(db_user)
+        await sess.commit()
+        await sess.refresh(db_user)
         return db_user
     @staticmethod
-    def delete_user(sess:Session,db_user:User):
-        sess.delete(db_user)
-        sess.commit()
+    async def delete_user(sess:AsyncSession,db_user:User):
+        await sess.delete(db_user)
+        await sess.commit()
     #now for jwt authentication
     @staticmethod
-    def get_user_by_email(sess:Session,email:str):
+    async def get_user_by_email(sess:AsyncSession,email:str):
         statement=select(User).where(User.email==email)
-        return sess.exec(statement).first()
+        return (await sess.exec(statement)).first()

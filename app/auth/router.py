@@ -1,12 +1,13 @@
 #googel oauth and jwt
 
 from app import users
-from sqlalchemy.orm import session
+# from sqlalchemy.orm import session
+from sqlalchemy.ext.asyncio import AsyncSession
 from app.config import settings
 import secrets
 from fastapi import APIRouter,Depends,HTTPException,status
 # from fastapi.security import OAuth2PasswordRequestForm
-from sqlmodel import Session
+# from sqlmodel import Session
 import token
 # pyrefly: ignore [missing-import]
 from google.oauth2 import id_token
@@ -23,9 +24,9 @@ from app.auth.schemas import Token,GoogleAuthRequest
 auth_router=APIRouter(prefix="/auth",tags=["auth"])
 
 @auth_router.post("/google",response_model=Token)
-def google_login(payload:GoogleAuthRequest,session:Session=Depends(get_session)):
+async def google_login(payload:GoogleAuthRequest,session:AsyncSession=Depends(get_session)):
     try:# 1. Verify the ID token signature with Google's keys,contacts Google's servers so that verify google mathematically signed this data
-        idinfo =id_token.verify_oauth2_token(payload.id_token,requests.Request(),settings.GOOGLE_CLIENT_ID)
+        idinfo = id_token.verify_oauth2_token(payload.id_token,requests.Request(),settings.GOOGLE_CLIENT_ID)
      #2 Check if the user's email has been verified on Google,verify user and fetch email ad google_sub
         if not idinfo.get("email_verified"):
             raise HTTPException(
@@ -41,7 +42,7 @@ def google_login(payload:GoogleAuthRequest,session:Session=Depends(get_session))
             detail="invalid google token"
         )
     # 3. Retrieve or create the user in the database
-    user=UserService.get_user_by_email(session,email)        
+    user=await UserService.get_user_by_email(session,email)        
     if not user:
         username_candidate=f"{email.split('@')[0]}_{google_sub[:4]}"
         #fenerate a random password to fill database since they login using google
@@ -52,7 +53,7 @@ def google_login(payload:GoogleAuthRequest,session:Session=Depends(get_session))
             password=random_password,
             role="user"
         )
-        user=UserService.create_user(session,new_user) #hand it to UserService(users/service) which will do password hashing with help of auth/utils.py
+        user=await UserService.create_user(session,new_user) #hand it to UserService(users/service) which will do password hashing with help of auth/utils.py
 
     #4 Generate app-specific JTW access token which has Header.Payload(contains userid).Signature
     access_token =create_access_token(data={"sub":str(user.id)})

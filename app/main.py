@@ -4,6 +4,8 @@ from contextlib import asynccontextmanager
 from sqlmodel import SQLModel
 from fastapi.middleware.cors import CORSMiddleware
 
+
+
 from app.books.router import book_router
 from app.database import engine
 from app.users.router import user_router
@@ -12,7 +14,8 @@ from app.auth.router import auth_router
 
 @asynccontextmanager
 async def lifespan(app:FastAPI):
-    SQLModel.metadata.create_all(engine)
+    async with engine.begin() as conn:
+        await conn.run_sync(SQLModel.metadata.create_all)
     yield
 
 

@@ -5,7 +5,9 @@ import os
 import uuid
 from fastapi import APIRouter,Depends,HTTPException,status
 from fastapi import File,UploadFile,Form
-from sqlmodel import Session,select
+from sqlmodel import select
+# from sqlalchemy.ext.asyncio import AsyncSession
+from sqlmodel.ext.asyncio.session import AsyncSession
 from typing import List,Optional
 
 from app.database import get_session
@@ -14,17 +16,18 @@ from app.books.schemas import BookCreate,BookResponse
 from app.books.service import BookService
 
 book_router=APIRouter(prefix="/books",tags=["books"])
+#for image adding
 
 @book_router.post("/",response_model=BookResponse,status_code=status.HTTP_201_CREATED)
-def create_book(
+async def create_book(
     title:str=Form(...),
     author:str=Form(...),
     category:str=Form(...),
     isbn:str=Form(...),
     image:Optional[UploadFile]=File(default=None),#configures fastapi to accept and uploaded file
-    session:Session=Depends(get_session)
+    session:AsyncSession=Depends(get_session)
 ):
-    existing_book=session.exec(select(Book).where(Book.isbn==isbn)).first()
+    existing_book=(await session.exec(select(Book).where(Book.isbn==isbn))).first()
     if existing_book:
         raise HTTPException(status_code=status.HTTP_409_CONFLICT,detail=f"book with isbn '{isbn}' already exists")
     
@@ -49,7 +52,7 @@ def create_book(
         image_url=image_url
 
     )
-    return BookService.create_book(session,book_data)
+    return await BookService.create_book(session,book_data)
 
 
 # @book_router.post("/",response_model=BookResponse,status_code=status.HTTP_201_CREATED)
@@ -63,25 +66,24 @@ def create_book(
 #         )
 #     return BookService.create_book(session,book_data)
 @book_router.get("/",response_model=list[BookResponse])
-def get_all_books(session:Session=Depends(get_session)):
-    return BookService.get_all_books(session)
+async def get_all_books(session:AsyncSession=Depends(get_session)):
+    return await BookService.get_all_books(session)
 
 @book_router.get("/{book_id}",response_model=BookResponse)
-def get_book(book_id:int,session:Session=Depends(get_session)):
-    db_book=BookService.get_book_by_id(session,book_id)
+async def get_book(book_id:int,session:AsyncSession=Depends(get_session)):
+    db_book=await BookService.get_book_by_id(session,book_id)
     if not db_book:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,detail=f"book with id{book_id}not found"
         )
     return db_book
 @book_router.delete("/{book_id}",status_code=status.HTTP_204_NO_CONTENT)
-def delete_book(book_id,session:Session=Depends(get_session)):
-    db_book=BookService.get_book_by_id(session,book_id)
+async def delete_book(book_id,session:AsyncSession=Depends(get_session)):
+    db_book=await BookService.get_book_by_id(session,book_id)
     if not db_book:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,detail=f"book with id{book_id}not found"
         )
-    BookService.delete_book(session,db_book)
+    await BookService.delete_book(session,db_book)
     return None
 
-#for image adding

@@ -1,37 +1,40 @@
+from sqlalchemy.ext.asyncio import session
 from datetime import datetime
-from sqlmodel import Session,select
+from sqlmodel import select
+# from sqlalchemy.ext.asyncio import AsyncSession
+from sqlmodel.ext.asyncio.session import AsyncSession
 from app.borrows.models import BorrowRecord
 from app.borrows.schemas import BorrowResponse,BorrowCreate
 from app.books.models import Book
 
 class BorrowService:
     @staticmethod 
-    def get_all_borrows(session:Session):
+    async def get_all_borrows(session:AsyncSession):
         statement=select(BorrowRecord)
-        return session.exec(statement).all()
+        return (await session.exec(statement)).all()
     @staticmethod
-    def get_borrow_by_id(session:Session,borrow_id:int):
-        return session.get(BorrowRecord,borrow_id)
+    async def get_borrow_by_id(session:AsyncSession,borrow_id:int):
+        return await session.get(BorrowRecord,borrow_id)
     @staticmethod
-    def borrow_book(session:Session,borrow_data:BorrowCreate):
+    async def borrow_book(session:AsyncSession,borrow_data:BorrowCreate):
         db_borrow=BorrowRecord(**borrow_data.model_dump())
         session.add(db_borrow)
-        book=session.get(Book,borrow_data.book_id)
+        book=await session.get(Book,borrow_data.book_id)
         if book:
             book.status="borrowed"
             session.add(book)
-        session.commit()
-        session.refresh(db_borrow)
+        await session.commit()
+        await session.refresh(db_borrow)
         return db_borrow
     @staticmethod
-    def return_book(session:Session,db_borrow:BorrowRecord):
+    async def return_book(session:AsyncSession,db_borrow:BorrowRecord):
         db_borrow.return_date=datetime.utcnow()
         session.add(db_borrow)
-        book=session.get(Book,db_borrow.book_id)
+        book=await session.get(Book,db_borrow.book_id)
         if book:
             book.status="available"
             session.add(book)
-        session.commit()
-        session.refresh(db_borrow)
+        await session.commit()
+        await session.refresh(db_borrow)
         return db_borrow
     

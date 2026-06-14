@@ -8,7 +8,13 @@ export function Header() {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
 
   useEffect(() => {
-    getCurrentUser().then(setCurrentUser);
+    // ✨ FIX: Safely catch the 401 error so it doesn't block or break state flows
+    getCurrentUser()
+      .then(setCurrentUser)
+      .catch((err) => {
+        console.log("No active user session found:", err);
+        setCurrentUser(null);
+      });
   }, []);
 
   return (
