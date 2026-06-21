@@ -109,7 +109,7 @@ Book LM/
 
 ---
 
-## 📄 Project Highlights (For Interviewers)
+## 📄 Project Highlights
 
 *   **Non-Blocking Async Database I/O:** Uses an asynchronous SQLite engine under the hood to ensure scaling capability under concurrent API calls.
 *   **Third-Party Authentication flow:** Validates Google OAuth Identity tokens cryptographically on the backend before minting application-specific JWTs.
