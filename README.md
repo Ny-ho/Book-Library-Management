@@ -3,22 +3,23 @@
 A professional, modern Library Management System built with a **FastAPI** asynchronous backend and a **React & TypeScript** frontend. The system supports full CRUD operations on books and users, record tracking for borrowed books, and Google OAuth 2.0 authentication combined with JSON Web Tokens (JWT).
 
 ---
-
 ## 📸 Screenshots
 
-To showcase your project, replace the placeholders below with screenshots of your running application:
-
 ### 1. Google OAuth 2.0 Sign-In Option
-*Provide a screenshot showing the clean landing page/auth page with the Google Sign-In button.*
+
 ![Google Sign-In](screenshots/google_signin.png)
 
 ### 2. Inventory / Create Book View
-*Provide a screenshot showing the UI where users can add new books to the library inventory.*
+
 ![Create Book Page](screenshots/create_book.png)
 
 ### 3. Borrowing & Returning Books View
-*Provide a screenshot showing how books can be checked out, their current status (borrowed/available), and the return actions.*
+
 ![Borrows Page](screenshots/borrows.png)
+
+### 4. Users list, email and role
+
+![usersPage](screenshots/users.png)
 
 ---
 
